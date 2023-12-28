@@ -2,9 +2,6 @@ import pandas as pd
 import streamlit as st
 from pathlib import Path
 
-import matplotlib as mpl
-import matplotlib.cm as cm
- 
 from pandas.api.types import (
     is_categorical_dtype,
     is_datetime64_any_dtype,
@@ -103,30 +100,24 @@ df, geo_df = load_data()
 # private_repository requires URL in relative form
 tab1, tab2, tab3 = st.tabs([ 'Time-series', 'LHA map', 'HSDA map' ])
   
-norm = mpl.colors.Normalize(vmin=-20, vmax=10)
-cmap = cm.hot
-m = cm.ScalarMappable(norm=norm, cmap=cmap)
-print(m.to_rgba(x))
-
-
 with tab1:    
     col1, col2 = st.columns((2))
     with col1:
         st.header("Table")    
-        sub_df = filter_dataframe( df )
-        st.dataframe( sub_df )
+        sub_df = filter_dataframe( df ) # filter entire df
+        st.dataframe( sub_df ) # display subset
     with col2:
+         # plot subset as time series
         st.header( "Time-series" )
-        st.bar_chart(data=sub_df, x='date', y='observedCounts') #, y=None, color=None, width=0, height=0,
-
-    
+        st.bar_chart(data=sub_df, x='date', y='observedCounts')     
+     
 hsda_codes = geo_df.copy()
 hsda_codes.drop_duplicates('HSDA_NAME',inplace=True )
 hsda_codes.set_index( 'HSDA_NAME', inplace=True)
 
-
-
-
+lha_codes = geo_df.copy()
+lha_codes.drop_duplicates('LHA_NAME',inplace=True )
+lha_codes.set_index( 'LHA_NAME', inplace=True)
 
 with tab2:   
     st.header("LHA")
@@ -134,12 +125,11 @@ with tab2:
         geo_df,     
         latitude  = 'LATITUDE',
         longitude = 'LONGITUDE',
-        size='LHA_ID',
-        color='observedCounts' )  
+        size='LHA_ID'
+    )  
         
 with tab3:   
-    val_df = sub_df.loc[:, ['surveillance_reported_hsda_abbr', 'observedCounts' ] ].groupby('surveillance_reported_hsda_abbr').median()
-    
+    val_df = sub_df.loc[:, ['surveillance_reported_hsda_abbr', 'observedCounts' ] ].groupby('surveillance_reported_hsda_abbr').median()    
     choices = np.unique( sub_df['surveillance_reported_hsda_abbr'] ) 
 
     val_df['lat']  = NaN
@@ -156,12 +146,15 @@ with tab3:
         caption += ' ' + k 
         
     st.text( caption )
-             
+
+    mx = val_df['observedCounts'].max() + 1e-10
+    val_df['color'] = val_df['observedCounts']/ mx
+ 
     st.header("HSDA")
     st.map( 
         val_df,     
         latitude  = 'lat',
         longitude = 'long',
         size='LHA_ID',
-        color='observedCounts' )  
+        color='color' )  
         
