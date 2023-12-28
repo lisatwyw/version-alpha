@@ -3,6 +3,10 @@ import streamlit as st
 from pathlib import Path
 import numpy as np
 
+import matplotlib as mpl
+import matplotlib.cm as cm
+   
+
 from pandas.api.types import (
     is_categorical_dtype,
     is_datetime64_any_dtype,
@@ -133,10 +137,10 @@ with tab3:
     val_df = sub_df.loc[:, ['surveillance_reported_hsda_abbr', 'observedCounts' ] ].groupby('surveillance_reported_hsda_abbr').median()    
     choices = np.unique( sub_df['surveillance_reported_hsda_abbr'] ) 
 
-    val_df['lat']  = NaN
-    val_df['long'] = NaN
+    val_df['lat']  = 0
+    val_df['long'] = 0
     
-    caption = 'Input file has these locations:'     
+    caption = 'Input file has these locations:\n'     
     
     for k in choices:
         try:
@@ -144,18 +148,20 @@ with tab3:
             val_df['long'] = hsda_codes.loc[ val_df[k] ].LONGITUDE               
         except:
             pass 
-        caption += ' ' + k 
+        caption += k  + ' | ' 
         
     st.text( caption )
+     
+    norm = matplotlib.colors.Normalize(vmin=0, vmax=21, clip=True)
+    mapper = plt.cm.ScalarMappable(norm=norm, cmap=plt.cm.viridis)
 
-    mx = val_df['observedCounts'].max() + 1e-10
-    val_df['color'] = val_df['observedCounts']/ mx
- 
+    val_df['hex_color'] = val_df['observedCounts'].apply(lambda x: mcolors.to_hex(mapper.to_rgba(x)))
+    
     st.header("HSDA")
     st.map( 
         val_df,     
         latitude  = 'lat',
         longitude = 'long',
-        size='LHA_ID',
+        size=10,
         color='color' )  
         
