@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
-import polars as pol
 from pathlib import Path
+
 from pandas.api.types import (
     is_categorical_dtype,
     is_datetime64_any_dtype,
@@ -10,7 +10,6 @@ from pandas.api.types import (
 )
 
 st.title("PHIDO demo for Jan 19")
-
 st.write(
     """This app will....
     """
@@ -92,8 +91,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 # private_repository requires URL in relative form
-
-geo_df = pol.read_csv( './data/GeoReferenceTableBC_city2lha.csv' ).to_pandas()
+geo_df = pol.read_csv( './data/GeoReferenceTableBC_city2lha.csv' )
 df = pd.read_csv("./data/sample_2019_repeated_10yr_weekly.csv")
 tab1, tab2  = st.tabs(["Map", "time-series"])
 
