@@ -103,14 +103,19 @@ tab1, tab2  = st.tabs(["Map", "time-series"])
 with tab1:    
     col1, col2 = st.columns((2))
     with col1:
-        st.header("LHA")
-        st.map( 
-            geo_df,     
-            latitude  = 'LATITUDE',
-            longitude = 'LONGITUDE',
-            size='LHA_ID', )            
-with tab2:
-    st.header("Table")    
-    st.dataframe(filter_dataframe(df))
-
-
+        st.header("Table")    
+        sub_df = filter_dataframe(df)
+        st.dataframe( sub_df )
+    with col2:
+        st.header()
+        st.bar_chart(data=sub_df, x='date', y='observedCounts') #, y=None, color=None, width=0, height=0,
+                 
+with tab2:   
+    st.header("LHA")
+    st.map( 
+        geo_df,     
+        latitude  = 'LATITUDE',
+        longitude = 'LONGITUDE',
+        size='LHA_ID',
+        color='observedCounts' )  
+        
