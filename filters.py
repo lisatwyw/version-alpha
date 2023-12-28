@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 from pathlib import Path
+import numpy as np
 
 from pandas.api.types import (
     is_categorical_dtype,
