@@ -89,9 +89,10 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
                     df = df[df[column].str.contains(user_text_input)]
     return df
 
-geo_df = pd.read_excel( Path('GeoReferenceTableBC.xlsx' ) )
+# private_repository requires URL in relative form
+geo_df = pd.read_excel( Path('./data/GeoReferenceTableBC.xlsx' ) )
 df = pd.read_csv(
-    "./data/sample_2019_repeated_10yr_weekly.csv" # private_repository requires URL in relative form
+    "./data/sample_2019_repeated_10yr_weekly.csv" 
 )
 
 tab1, tab2  = st.tabs(["Map", "time-series"])
