@@ -11,8 +11,7 @@ from pandas.api.types import (
 
 st.title("PHIDO demo for Jan 19")
 st.write(
-    """This app will....
-    """
+    """This is a demo app."""
 )
 
 def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
@@ -90,13 +89,18 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
                     df = df[df[column].str.contains(user_text_input)]
     return df
 
+@st.cache_data
+def load_data():
+    geo_df = pd.read_csv( './data/GeoReferenceTableBC_city2lha.csv' )
+    df = pd.read_csv("./data/sample_2019_repeated_10yr_weekly.csv")
+    return df, geo_df
+
+df, geo_df = load_data()
+
 # private_repository requires URL in relative form
-geo_df = pd.read_csv( './data/GeoReferenceTableBC_city2lha.csv' )
-df = pd.read_csv("./data/sample_2019_repeated_10yr_weekly.csv")
 tab1, tab2  = st.tabs(["Map", "time-series"])
 
-with tab1:
-    
+with tab1:    
     col1, col2 = st.columns((2))
     with col1:
         st.header("LHA")
@@ -104,9 +108,7 @@ with tab1:
             geo_df,     
             latitude  = 'LATITUDE',
             longitude = 'LONGITUDE',
-            size='LHA_ID', )
-        
-    
+            size='LHA_ID', )            
 with tab2:
     st.header("Table")    
     st.dataframe(filter_dataframe(df))
