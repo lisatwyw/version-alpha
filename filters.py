@@ -94,6 +94,6 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 df = pd.read_csv(
-    "https://raw.githubusercontent.com/mcnakhaee/palmerpenguins/master/palmerpenguins/data/penguins.csv"
+    "https://raw.githubusercontent.com/lisatwyw/version-alpha/main/data/sample_2019_repeated_10yr_weekly.csv"
 )
 st.dataframe(filter_dataframe(df))
