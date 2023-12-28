@@ -10,9 +10,7 @@ from pandas.api.types import (
 st.title("PHIDO demo for Jan 19")
 
 st.write(
-    """This app accomodates the blog [here](https://blog.streamlit.io/auto-generate-a-dataframe-filtering-ui-in-streamlit-with-filter_dataframe/)
-    and walks you through one example of how the Streamlit
-    Data Science Team builds add-on functions to Streamlit.
+    """This app will....
     """
 )
 
@@ -92,7 +90,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 df = pd.read_csv(
-    "./data/sample_2019_repeated_10yr_weekly.csv"
+    "./data/sample_2019_repeated_10yr_weekly.csv" # private_repository requires URL in relative form
 )
 
 st.dataframe(filter_dataframe(df))
