@@ -89,8 +89,28 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
                     df = df[df[column].str.contains(user_text_input)]
     return df
 
+geo_df = pd.read_excel( Path('GeoReferenceTableBC.xlsx' ) )
 df = pd.read_csv(
     "./data/sample_2019_repeated_10yr_weekly.csv" # private_repository requires URL in relative form
 )
 
-st.dataframe(filter_dataframe(df))
+tab1, tab2  = st.tabs(["Map", "time-series"])
+
+with tab1:
+    
+    col1, col2 = st.columns((2))
+    with col1:
+        st.header("LHA")
+        st.map( 
+            geo_df.to_pandas(),     
+            latitude  = 'LATITUDE',
+            longitude = 'LONGITUDE',
+            size='LHA_ID', )
+        
+
+    
+with tab2:
+    st.header("Table")    
+    st.dataframe(filter_dataframe(df))
+
+
