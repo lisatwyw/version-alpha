@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+from pathlib import Path
 from pandas.api.types import (
     is_categorical_dtype,
     is_datetime64_any_dtype,
@@ -90,9 +91,9 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 # private_repository requires URL in relative form
-geo_df = pd.read_excel( './data/GeoReferenceTableBC.xlsx' ) 
+geo_df = pd.read_excel( Path('./data/GeoReferenceTableBC.xlsx' ) )
 df = pd.read_csv(
-    "./data/sample_2019_repeated_10yr_weekly.csv" 
+    Path( "./data/sample_2019_repeated_10yr_weekly.csv" )
 )
 
 tab1, tab2  = st.tabs(["Map", "time-series"])
