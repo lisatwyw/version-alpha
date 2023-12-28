@@ -89,11 +89,10 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
                 )
                 if user_text_input:
                     df = df[df[column].str.contains(user_text_input)]
-
     return df
-
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/lisatwyw/version-alpha/main/data/sample_2019_repeated_10yr_weekly.csv"
 )
+
 st.dataframe(filter_dataframe(df))
