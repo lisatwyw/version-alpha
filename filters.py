@@ -2,6 +2,9 @@ import pandas as pd
 import streamlit as st
 from pathlib import Path
 
+import matplotlib as mpl
+import matplotlib.cm as cm
+ 
 from pandas.api.types import (
     is_categorical_dtype,
     is_datetime64_any_dtype,
@@ -98,24 +101,67 @@ def load_data():
 df, geo_df = load_data()
 
 # private_repository requires URL in relative form
-tab1, tab2  = st.tabs(["Map", "time-series"])
+tab1, tab2, tab3 = st.tabs([ 'Time-series', 'LHA map', 'HSDA map' ])
+  
+norm = mpl.colors.Normalize(vmin=-20, vmax=10)
+cmap = cm.hot
+m = cm.ScalarMappable(norm=norm, cmap=cmap)
+print(m.to_rgba(x))
+
 
 with tab1:    
     col1, col2 = st.columns((2))
     with col1:
         st.header("Table")    
-        sub_df = filter_dataframe(df)
+        sub_df = filter_dataframe( df )
         st.dataframe( sub_df )
     with col2:
-        st.header()
+        st.header( "Time-series" )
         st.bar_chart(data=sub_df, x='date', y='observedCounts') #, y=None, color=None, width=0, height=0,
-                 
+
+    
+hsda_codes = geo_df.copy()
+hsda_codes.drop_duplicates('HSDA_NAME',inplace=True )
+hsda_codes.set_index( 'HSDA_NAME', inplace=True)
+
+
+
+
+
 with tab2:   
     st.header("LHA")
     st.map( 
         geo_df,     
         latitude  = 'LATITUDE',
         longitude = 'LONGITUDE',
+        size='LHA_ID',
+        color='observedCounts' )  
+        
+with tab3:   
+    val_df = sub_df.loc[:, ['surveillance_reported_hsda_abbr', 'observedCounts' ] ].groupby('surveillance_reported_hsda_abbr').median()
+    
+    choices = np.unique( sub_df['surveillance_reported_hsda_abbr'] ) 
+
+    val_df['lat']  = NaN
+    val_df['long'] = NaN
+    
+    caption = 'Input file has these locations:'     
+    
+    for k in choices:
+        try:
+            val_df['lat']  = hsda_codes.loc[ val_df[k] ].LATITUDE         
+            val_df['long'] = hsda_codes.loc[ val_df[k] ].LONGITUDE               
+        except:
+            pass 
+        caption += ' ' + k 
+        
+    st.text( caption )
+             
+    st.header("HSDA")
+    st.map( 
+        val_df,     
+        latitude  = 'lat',
+        longitude = 'long',
         size='LHA_ID',
         color='observedCounts' )  
         
