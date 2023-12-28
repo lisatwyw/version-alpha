@@ -1,5 +1,7 @@
 import pandas as pd
 import streamlit as st
+import polars as pol
+from pathlib import Path
 from pandas.api.types import (
     is_categorical_dtype,
     is_datetime64_any_dtype,
@@ -90,7 +92,8 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 # private_repository requires URL in relative form
-geo_df = pd.read_csv( './data/GeoReferenceTableBC_city2lha.csv' ) 
+
+geo_df = pol.read_csv( './data/GeoReferenceTableBC_city2lha.csv' ).to_pandas()
 df = pd.read_csv("./data/sample_2019_repeated_10yr_weekly.csv")
 tab1, tab2  = st.tabs(["Map", "time-series"])
 
@@ -100,12 +103,11 @@ with tab1:
     with col1:
         st.header("LHA")
         st.map( 
-            geo_df.to_pandas(),     
+            geo_df,     
             latitude  = 'LATITUDE',
             longitude = 'LONGITUDE',
             size='LHA_ID', )
         
-
     
 with tab2:
     st.header("Table")    
