@@ -90,7 +90,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 # private_repository requires URL in relative form
-geo_df = pd.read_excel( Path('./data/GeoReferenceTableBC.xlsx' ) )
+geo_df = pd.read_excel( './data/GeoReferenceTableBC.xlsx' ) 
 df = pd.read_csv(
     "./data/sample_2019_repeated_10yr_weekly.csv" 
 )
