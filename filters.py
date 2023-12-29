@@ -236,4 +236,3 @@ with tab4:
             longitude = 'long',
             size=100,
             color='hex_color' )              
-    ''';
