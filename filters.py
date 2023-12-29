@@ -4,8 +4,12 @@ from pathlib import Path
 import numpy as np
 
 import matplotlib as mpl
+import matplotlib.pyplot as plt 
+import matplotlib.colors as mcolors
 import matplotlib.cm as cm
    
+import polars as pol 
+
 
 from pandas.api.types import (
     is_categorical_dtype,
@@ -16,10 +20,10 @@ from pandas.api.types import (
 
 st.title("PHIDO demo for Jan 19")
 st.write(
-    """This is a demo app."""
+    """"""
 )
 
-def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def filter_dataframe(df, name_of_chkbox, select_cols = None ) -> pd.DataFrame:
     """
     Adds a UI on top of a dataframe to let viewers filter columns
 
@@ -29,7 +33,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Filtered dataframe
     """
-    modify = st.checkbox("Add filters")
+    modify = st.checkbox( name_of_chkbox )
 
     if not modify:
         return df
@@ -49,8 +53,12 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     modification_container = st.container()
 
+    if select_cols is None:
+        select_cols = df.columns
+    
+        
     with modification_container:
-        to_filter_columns = st.multiselect("Filter dataframe on", df.columns)
+        to_filter_columns = st.multiselect("Filter dataframe on", select_cols )
         for column in to_filter_columns:
             left, right = st.columns((1, 20))
             left.write("↳")
@@ -95,27 +103,35 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 @st.cache_data
-def load_data():
+def load_data(): # private_repository requires URL of resources in relative form
     geo_df = pd.read_csv( './data/GeoReferenceTableBC_city2lha.csv' )
-    df = pd.read_csv("./data/sample_2019_repeated_10yr_weekly.csv")
+    df = pol.read_csv("./data/sample_2019_repeated_10yr_weekly.csv")
     return df, geo_df
 
-df, geo_df = load_data()
+input_pol, geo_df = load_data()
 
-# private_repository requires URL in relative form
-tab1, tab2, tab3 = st.tabs([ 'Time-series', 'LHA map', 'HSDA map' ])
-  
-with tab1:    
-    col1, col2 = st.columns((2))
-    with col1:
-        st.header("Table")    
-        sub_df = filter_dataframe( df ) # filter entire df
-        st.dataframe( sub_df ) # display subset
-    with col2:
-         # plot subset as time series
-        st.header( "Time-series" )
-        st.bar_chart(data=sub_df, x='date', y='observedCounts')     
-     
+    
+from datetime import datetime
+# convert from string to datetime field
+try:
+    input_pol = input_pol.with_columns( pol.col("date").str.to_datetime("%m-%d-%Y").alias('date_dt') )    
+except:    
+    input_pol = input_pol.with_columns( pol.col("date").str.to_datetime("%Y-%m-%d").alias('date_dt') )
+
+# we can now do math on last field 
+enddate   = input_pol[:,-1].max()  
+
+# Getting the min and max date 
+endDate = pd.to_datetime( input_pol["date"]).max()
+try:
+    startDate = endDate - pd.DateOffset( months = 12 )
+    print('There exists sufficient data to examine last 12 months')
+except:
+    startDate = endDate - pd.DateOffset( months = 1 )
+    print('There exists sufficient data to examine last 30 days')
+
+    
+# ================== setup the maps ==================
 hsda_codes = geo_df.copy()
 hsda_codes.drop_duplicates('HSDA_NAME',inplace=True )
 hsda_codes.set_index( 'HSDA_NAME', inplace=True)
@@ -124,44 +140,100 @@ lha_codes = geo_df.copy()
 lha_codes.drop_duplicates('LHA_NAME',inplace=True )
 lha_codes.set_index( 'LHA_NAME', inplace=True)
 
-with tab2:   
+
+# ================== setup the layout ==================
+tab1, tab2, tab3, tab4, tab5 = st.tabs([ 'Table', 'Time-series', 'LHA map', 'HSDA map', 'Counts by disease' ])
+  
+
+with tab1:
+    # plot subset as time series
+    st.header("Time-series")
+
+    # ======================================== Ctrl for Element 1 ========================================
+    col1, col2 = st.columns((2))
+    with col1:
+        date1 = pd.to_datetime(st.date_input("Start Date", startDate))
+    with col2:
+        date2 = pd.to_datetime(st.date_input("End Date", endDate))
+
+    sub_pol = input_pol.filter( pol.col("date_dt") > date1 ).filter( pol.col("date_dt") < date2 )   
+
+    st.scatter_chart( data=sub_pol.to_pandas(), 
+                     x='date', 
+                     y=['observedCounts', 'fittedCounts' ],
+                     color=['#FF0000', '#0000FF'],
+                     size = 2 
+                     )     
+     
+
+with tab2:    
+    #col1, col2 = st.columns((2))    
+    st.header("Table")    
+    sub_df = filter_dataframe( input_pol.to_pandas(), 'Add filters' ) # filter entire df
+    st.dataframe( sub_df ) # display subset
+
+
+with tab3:       
     st.header("LHA")
     st.map( 
         geo_df,     
         latitude  = 'LATITUDE',
         longitude = 'LONGITUDE',
-        size='LHA_ID'
-    )  
-        
-with tab3:   
-    val_df = sub_df.loc[:, ['surveillance_reported_hsda_abbr', 'observedCounts' ] ].groupby('surveillance_reported_hsda_abbr').median()    
-    choices = np.unique( sub_df['surveillance_reported_hsda_abbr'] ) 
+        size=20, 
+        color = '#daa'
+    )          
+    st.dataframe( geo_df )
 
-    val_df['lat']  = 0
-    val_df['long'] = 0
-    
-    caption = 'Input file has these locations:\n'     
-    
-    for k in choices:
+
+with tab5:       
+    diseases = np.unique( sub_df['surveillance_condition'] )
+    st.text(diseases)
+   
+    columns = [ 'surveillance_reported_hsda_abbr', 'date' ]
+
+    for d in diseases: 
+        D = sub_pol.filter( pol.col('surveillance_condition') == d )
+        val_df = D.to_pandas().loc[:, [ 'surveillance_reported_hsda_abbr', 'observedCounts' ] ].groupby('surveillance_reported_hsda_abbr', group_keys = False ).sum()    
+        st.text( d )
+        st.dataframe( val_df )     
+        
+
+with tab4:
+    S = ['status','surveillance_condition', 'surveillance_reported_hsda_abbr', 'observedCounts']
+    sub_df = filter_dataframe( input_pol.select(S).to_pandas(), 'Add select filters:',  ) # filter entire df
+    st.dataframe( sub_df )
+
+    diseases = np.unique( sub_df['surveillance_condition'] )       
+    st.text(diseases)
+
+    '''
+    for d in diseases: 
+        D = sub_pol.filter( pol.col('surveillance_condition') == d )
+        val_df = D.to_pandas().loc[:, [ 'surveillance_reported_hsda_abbr', 'observedCounts' ] ].groupby('surveillance_reported_hsda_abbr', group_keys = False ).sum()    
+        
+        val_df['lat']  = 0
+        val_df['long'] = 0
+        
         try:
             val_df['lat']  = hsda_codes.loc[ val_df[k] ].LATITUDE         
             val_df['long'] = hsda_codes.loc[ val_df[k] ].LONGITUDE               
         except:
             pass 
-        caption += k  + ' | ' 
-        
-    st.text( caption )
-     
-    norm = matplotlib.colors.Normalize(vmin=0, vmax=21, clip=True)
-    mapper = plt.cm.ScalarMappable(norm=norm, cmap=plt.cm.viridis)
+            
+        #st.text( caption )
+        st.dataframe( val_df ) 
 
-    val_df['hex_color'] = val_df['observedCounts'].apply(lambda x: mcolors.to_hex(mapper.to_rgba(x)))
-    
-    st.header("HSDA")
-    st.map( 
-        val_df,     
-        latitude  = 'lat',
-        longitude = 'long',
-        size=10,
-        color='color' )  
+        mx = val_df['observedCounts'].max() + 1e-10 
+        norm = mpl.colors.Normalize(vmin=0, vmax=mx, clip=True)
+        mapper = plt.cm.ScalarMappable(norm=norm, cmap=plt.cm.viridis)
+
+        val_df['hex_color'] = val_df['observedCounts'].apply(lambda x: mcolors.to_hex(mapper.to_rgba(x)))
         
+        st.header("Total counts per location by HSDA classification")
+        st.map( 
+            val_df,     
+            latitude  = 'lat',
+            longitude = 'long',
+            size=100,
+            color='hex_color' )              
+    ''';
