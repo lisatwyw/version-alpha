@@ -145,8 +145,7 @@ lha_codes.set_index( 'LHA_NAME', inplace=True)
 
 
 # ================== setup the layout ==================
-tab1, tab2, tab3, tab4, tab5 = st.tabs([ 'Table', 'Time-series', 'LHA map', 'HSDA map', 'Counts by disease' ])
-  
+tab1, tab2, tab3, tab4, tab5 = st.tabs([  'Time-series', 'Table', 'LHA map', 'HSDA map', 'Counts by disease' ]) 
 
 with tab1:
     # plot subset as time series
