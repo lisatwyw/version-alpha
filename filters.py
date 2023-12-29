@@ -153,8 +153,9 @@ with tab1:
     with col2:
         date2 = pd.to_datetime(st.date_input("End Date", endDate))
 
-    columns = [ 'surveillance_reported_hsda_abbr', 'status', 'surveillance_condition' ]
     sub_pol = input_pol.filter( pol.col("date_dt") > date1 ).filter( pol.col("date_dt") < date2 )   
+
+    columns = [ 'surveillance_reported_hsda_abbr', 'status', 'surveillance_condition', 'date' ]
     sub_df = filter_dataframe( sub_pol.select( columns ).to_pandas(), 'Add filters' )
     st.scatter_chart( data=sub_df, 
                      x='date', 
