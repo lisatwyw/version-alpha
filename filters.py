@@ -8,8 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
    
-import polars as pol 
-
+import polars as pol
 
 from pandas.api.types import (
     is_categorical_dtype,
@@ -17,6 +16,10 @@ from pandas.api.types import (
     is_numeric_dtype,
     is_object_dtype,
 )
+
+from folium.plugins import HeatMap, HeatMapWithTime
+import plotly.express as px
+
 
 st.title("PHIDO demo for Jan 19")
 st.write(
@@ -203,36 +206,40 @@ with tab4:
     sub_df = filter_dataframe( input_pol.select(S).to_pandas(), 'Add select filters:',  ) # filter entire df
     st.dataframe( sub_df )
 
-    diseases = np.unique( sub_df['surveillance_condition'] )       
-    st.text(diseases)
+    regions = np.unique( sub_df['surveillance_reported_hsda_abbr'] )       
+    st.text(regions)
 
-    '''
-    for d in diseases: 
-        D = sub_pol.filter( pol.col('surveillance_condition') == d )
-        val_df = D.to_pandas().loc[:, [ 'surveillance_reported_hsda_abbr', 'observedCounts' ] ].groupby('surveillance_reported_hsda_abbr', group_keys = False ).sum()    
-        
-        val_df['lat']  = 0
-        val_df['long'] = 0
-        
+    for reg in regions:
         try:
-            val_df['lat']  = hsda_codes.loc[ val_df[k] ].LATITUDE         
-            val_df['long'] = hsda_codes.loc[ val_df[k] ].LONGITUDE               
+            lat = hsda_codes.loc[ reg ].LATITUDE     
+            long= hsda_codes.loc[ reg ].LONGITUDE
+            sub_df.loc[ sub_df['surveillance_reported_hsda_abbr']== reg , 'lat'] = lat
+            sub_df.loc[ sub_df['surveillance_reported_hsda_abbr']== reg, 'long'] = long
+            st.text( f'{reg}: ({lat},{long})' ) 
         except:
-            pass 
-            
-        #st.text( caption )
-        st.dataframe( val_df ) 
+            st.text( reg ) 
 
-        mx = val_df['observedCounts'].max() + 1e-10 
+    def draw_map( V ):
+
+        V = V.dropna(axis='rows').copy()
+        mx = V['observedCounts'].max() + 1e-10 
         norm = mpl.colors.Normalize(vmin=0, vmax=mx, clip=True)
         mapper = plt.cm.ScalarMappable(norm=norm, cmap=plt.cm.viridis)
 
-        val_df['hex_color'] = val_df['observedCounts'].apply(lambda x: mcolors.to_hex(mapper.to_rgba(x)))
-        
-        st.header("Total counts per location by HSDA classification")
+
+
+        #V['hex_color'] = V['observedCounts'].apply(lambda x: mcolors.to_hex(mapper.to_rgba(x)))        
+        V['size'] = V['observedCounts']*10
+        st.text('show map?')
+        st.dataframe(V) 
+        st.header("Total counts per location by HSDA classification: size is proportional to total count")
         st.map( 
-            val_df,     
+            V,     
             latitude  = 'lat',
             longitude = 'long',
-            size=100,
-            color='hex_color' )              
+            size='size',
+            color='#ff6666' )              
+ 
+    draw_map(sub_df)
+
+    
