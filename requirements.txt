@@ -1,3 +1,5 @@
 matplotlib==3.8.2
 seaborn==0.13.0
 polars==0.20.2
+folium==0.15.1 
+plotly==5.18.0
