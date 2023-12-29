@@ -26,7 +26,7 @@ st.write(
     """"""
 )
 
-def filter_dataframe(df, name_of_chkbox, select_cols = None ) -> pd.DataFrame:
+def filter_dataframe(df, name_of_chkbox,  ) -> pd.DataFrame:
     """
     Adds a UI on top of a dataframe to let viewers filter columns
 
@@ -55,13 +55,8 @@ def filter_dataframe(df, name_of_chkbox, select_cols = None ) -> pd.DataFrame:
             df[col] = df[col].dt.tz_localize(None)
 
     modification_container = st.container()
-
-    if select_cols is None:
-        select_cols = df.columns
-    
-        
     with modification_container:
-        to_filter_columns = st.multiselect("Filter dataframe on", select_cols )
+        to_filter_columns = st.multiselect("Filter dataframe on", df.columns )
         for column in to_filter_columns:
             left, right = st.columns((1, 20))
             left.write("↳")
@@ -158,9 +153,10 @@ with tab1:
     with col2:
         date2 = pd.to_datetime(st.date_input("End Date", endDate))
 
+    columns = [ 'surveillance_reported_hsda_abbr', 'status', 'surveillance_condition', 'date' ]
     sub_pol = input_pol.filter( pol.col("date_dt") > date1 ).filter( pol.col("date_dt") < date2 )   
-
-    st.scatter_chart( data=sub_pol.to_pandas(), 
+    sub_df = filter_dataframe( input_pol.select( columns ).to_pandas(), 'Add filters' )
+    st.scatter_chart( data=sub_df, 
                      x='date', 
                      y=['observedCounts', 'fittedCounts' ],
                      color=['#FF0000', '#0000FF'],
@@ -171,7 +167,7 @@ with tab1:
 with tab2:    
     #col1, col2 = st.columns((2))    
     st.header("Table")    
-    sub_df = filter_dataframe( input_pol.to_pandas(), 'Add filters' ) # filter entire df
+    sub_df = filter_dataframe( input_pol.to_pandas(), 'Add filters?' ) # filter entire df
     st.dataframe( sub_df ) # display subset
 
 
@@ -191,7 +187,7 @@ with tab5:
     diseases = np.unique( sub_df['surveillance_condition'] )
     st.text(diseases)
    
-    columns = [ 'surveillance_reported_hsda_abbr', 'date' ]
+    
 
     for d in diseases: 
         D = sub_pol.filter( pol.col('surveillance_condition') == d )
@@ -202,7 +198,7 @@ with tab5:
 
 with tab4:
     S = ['status','surveillance_condition', 'surveillance_reported_hsda_abbr', 'observedCounts']
-    sub_df = filter_dataframe( input_pol.select(S).to_pandas(), 'Add select filters:',  ) # filter entire df
+    sub_df = filter_dataframe( input_pol.select(S).to_pandas(), 'Add select filters:' ) # filter entire df
     st.dataframe( sub_df )
 
     regions = np.unique( sub_df['surveillance_reported_hsda_abbr'] )       
