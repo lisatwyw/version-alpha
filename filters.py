@@ -117,7 +117,7 @@ except:
     input_pol = input_pol.with_columns( pol.col("date").str.to_datetime("%Y-%m-%d").alias('date_dt') )
 
 # we can now do math on last field 
-enddate   = input_pol[:,-1].max()  
+enddate = input_pol[:,-1].max()  
 
 # Getting the min and max date 
 endDate = pd.to_datetime( input_pol["date"]).max()
@@ -153,9 +153,9 @@ with tab1:
     with col2:
         date2 = pd.to_datetime(st.date_input("End Date", endDate))
 
-    columns = [ 'surveillance_reported_hsda_abbr', 'status', 'surveillance_condition', 'date' ]
+    columns = [ 'surveillance_reported_hsda_abbr', 'status', 'surveillance_condition' ]
     sub_pol = input_pol.filter( pol.col("date_dt") > date1 ).filter( pol.col("date_dt") < date2 )   
-    sub_df = filter_dataframe( input_pol.select( columns ).to_pandas(), 'Add filters' )
+    sub_df = filter_dataframe( sub_pol.select( columns ).to_pandas(), 'Add filters' )
     st.scatter_chart( data=sub_df, 
                      x='date', 
                      y=['observedCounts', 'fittedCounts' ],
