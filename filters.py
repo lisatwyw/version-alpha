@@ -219,16 +219,13 @@ with tab4:
             st.text( reg ) 
 
     def draw_map( V ):
-
         V = V.dropna(axis='rows').copy()
         mx = V['observedCounts'].max() + 1e-10 
         norm = mpl.colors.Normalize(vmin=0, vmax=mx, clip=True)
         mapper = plt.cm.ScalarMappable(norm=norm, cmap=plt.cm.viridis)
-
-
-
+       
         #V['hex_color'] = V['observedCounts'].apply(lambda x: mcolors.to_hex(mapper.to_rgba(x)))        
-        V['size'] = V['observedCounts']*10
+        V['size'] = V['observedCounts']*100
         st.text('show map?')
         st.dataframe(V) 
         st.header("Total counts per location by HSDA classification: size is proportional to total count")
