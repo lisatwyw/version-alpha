@@ -4,6 +4,8 @@ from pathlib import Path
 import numpy as np
 
 import matplotlib as mpl
+import matplotlib.pyplot as plt 
+import matplotlib.colors as mcolors
 import matplotlib.cm as cm
    
 
@@ -130,12 +132,13 @@ with tab2:
         geo_df,     
         latitude  = 'LATITUDE',
         longitude = 'LONGITUDE',
-        size='LHA_ID'
+        size=10, 
+        color = '#daa'
     )  
         
 with tab3:   
-    val_df = sub_df.loc[:, ['surveillance_reported_hsda_abbr', 'observedCounts' ] ].groupby('surveillance_reported_hsda_abbr').median()    
-    choices = np.unique( sub_df['surveillance_reported_hsda_abbr'] ) 
+    val_df = df.loc[:, ['surveillance_reported_hsda_abbr', 'observedCounts' ] ].groupby('surveillance_reported_hsda_abbr').median()    
+    choices = np.unique( df['surveillance_reported_hsda_abbr'] ) 
 
     val_df['lat']  = 0
     val_df['long'] = 0
@@ -152,7 +155,8 @@ with tab3:
         
     st.text( caption )
      
-    norm = matplotlib.colors.Normalize(vmin=0, vmax=21, clip=True)
+    mx = val_df['observedCounts'].max() + 1e-10 
+    norm = mpl.colors.Normalize(vmin=0, vmax=mx, clip=True)
     mapper = plt.cm.ScalarMappable(norm=norm, cmap=plt.cm.viridis)
 
     val_df['hex_color'] = val_df['observedCounts'].apply(lambda x: mcolors.to_hex(mapper.to_rgba(x)))
@@ -162,6 +166,6 @@ with tab3:
         val_df,     
         latitude  = 'lat',
         longitude = 'long',
-        size=10,
-        color='color' )  
+        size=100,
+        color='hex_color' )  
         
