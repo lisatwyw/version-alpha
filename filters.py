@@ -108,7 +108,17 @@ def load_data(): # private_repository requires URL of resources in relative form
 
 input_pol, geo_df = load_data()
 
-    
+@st.cache_data
+def load_new_data(): # private_repository requires URL of resources in relative form
+   df = pol.read_csv("./data/sample_2019_repeated_10yr_weekly.csv")
+   return df
+      
+fl = st.file_uploader(":file_folder: Upload a file",type=(["csv","txt","xlsx","xls"]))
+if fl is not None:
+   filename = fl.name
+   st.write(filename)
+   df = load_new_data(filename) # encoding = "ISO-8859-1")
+      
 from datetime import datetime
 # convert from string to datetime field
 try:
