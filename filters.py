@@ -165,10 +165,10 @@ with tab1:
 
     sub_pol = input_pol.filter( pol.col("date_dt") > date1 ).filter( pol.col("date_dt") < date2 )   
 
-    columns = [ 'surveillance_reported_hsda_abbr', 'status', 'surveillance_condition', 'date' ]
+    columns = [ 'observedCounts', 'fittedCounts', 'surveillance_reported_hsda_abbr', 'status', 'surveillance_condition', 'date_dt' ]
     sub_df = filter_dataframe( sub_pol.select( columns ).to_pandas(), 'Add filters' )
     st.scatter_chart( data=sub_df, 
-                     x='date', 
+                     x='date_dt', 
                      y=['observedCounts', 'fittedCounts' ],
                      color=['#FF0000', '#0000FF'],
                      size = 2 
