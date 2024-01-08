@@ -23,7 +23,7 @@ import plotly.express as px
 
 st.title("PHIDO - Version Alpha (premature prototype)")
 st.write(
-    """"""
+    """This is a toy example that does not run PHIDO but rather, uses outputs saved to a CSV file. \nAnother work-in-progress version in R Shiny will run PHIDO on-the-fly. The upload widget does not work but shown as a conceptual feature only."""
 )
 
 def filter_dataframe(df, name_of_chkbox,  ) -> pd.DataFrame:
