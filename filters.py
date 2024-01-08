@@ -109,14 +109,14 @@ def load_data(): # private_repository requires URL of resources in relative form
 input_pol, geo_df = load_data()
 
 @st.cache_data
-def load_new_data(filename='./data/sample_2019_repeated_10yr_weekly.csv'): # private_repository requires URL of resources in relative form
+def load_new_data(filename): # private_repository requires URL of resources in relative form
    df = pol.read_csv(filename)
    return df
       
 fl = st.file_uploader(":file_folder: Upload a file",type=(["csv","txt","xlsx","xls"]))
 if fl is not None:
    filename = fl.name
-   st.write(filename)
+   st.write( 'Reading in ' + filename )
    try:
       input_pol = load_new_data(filename)
       input_pol.date_dt[0]
