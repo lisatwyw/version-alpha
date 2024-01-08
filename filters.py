@@ -21,7 +21,7 @@ from folium.plugins import HeatMap, HeatMapWithTime
 import plotly.express as px
 
 
-st.title("PHIDO demo for Jan 19")
+st.title("PHIDO - Version Alpha (premature prototype)")
 st.write(
     """"""
 )
@@ -109,8 +109,8 @@ def load_data(): # private_repository requires URL of resources in relative form
 input_pol, geo_df = load_data()
 
 @st.cache_data
-def load_new_data(): # private_repository requires URL of resources in relative form
-   df = pol.read_csv("./data/sample_2019_repeated_10yr_weekly.csv")
+def load_new_data(filename='./data/sample_2019_repeated_10yr_weekly.csv'): # private_repository requires URL of resources in relative form
+   df = pol.read_csv(filename)
    return df
       
 fl = st.file_uploader(":file_folder: Upload a file",type=(["csv","txt","xlsx","xls"]))
