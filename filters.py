@@ -117,7 +117,11 @@ fl = st.file_uploader(":file_folder: Upload a file",type=(["csv","txt","xlsx","x
 if fl is not None:
    filename = fl.name
    st.write(filename)
-   df = load_new_data(filename) # encoding = "ISO-8859-1")
+   try:
+      input_pol = load_new_data(filename)
+      input_pol.date_dt[0]
+   except Exception as e:
+      st.write( e ) 
       
 from datetime import datetime
 # convert from string to datetime field
