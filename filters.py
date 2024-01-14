@@ -113,8 +113,9 @@ input_pol, geo_df = load_data()
 def load_new_data(filename): # private_repository requires URL of resources in relative form
    df = pol.read_csv(filename)
    return df
-      
-fl = st.file_uploader(":file_folder: Upload a file",type=(["csv","txt","xlsx","xls"]))
+
+st.session_state.disabled = True
+fl = st.file_uploader(":file_folder: Upload a file",type=(["csv","txt","xlsx","xls"]), disabled=st.session_state.disabled )
 if fl is not None:
    filename = fl.name
    st.write( 'Reading in ' + filename )
