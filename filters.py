@@ -103,7 +103,8 @@ def filter_dataframe(df, name_of_chkbox,  ) -> pd.DataFrame:
 @st.cache_data
 def load_data(): # private_repository requires URL of resources in relative form
     geo_df = pd.read_csv( './data/GeoReferenceTableBC_city2lha.csv' )
-    df = pol.read_csv("./data/sample_2019_repeated_10yr_weekly.csv")
+    #df = pol.read_csv("./data/sample_2019_repeated_10yr_weekly.csv")
+    df = pol.read_csv("./data/PHIDO_2.0_2018-08-14_to_2019-05-25_all_diseases.csv")
     return df, geo_df
 
 input_pol, geo_df = load_data()
