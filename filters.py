@@ -156,11 +156,11 @@ lha_codes.set_index( 'LHA_NAME', inplace=True)
 
 
 # ================== setup the layout ==================
-tab1, tab2, tab3, tab4, tab5 = st.tabs([  'Time-series', 'Table', 'LHA map', 'HSDA map', 'Counts by disease' ]) 
+tab1, tab2, tab3, tab4, tab5 = st.tabs([ 'Stats Table', 'Trends', 'LHA map', 'HSDA map', 'Counts by disease' ]) 
 
 with tab2:
     # plot subset as time series
-    st.header("Time-series")
+    st.header("Predicted and Actual counts over time")
 
     # ======================================== Ctrl for Element 1 ========================================
     col1, col2 = st.columns((2))
@@ -183,7 +183,8 @@ with tab2:
 
 with tab1:    
     #col1, col2 = st.columns((2))    
-    st.header("Table (limited to the first 100k rows to enable sorting capability)")    
+    st.header("Stats table (mock)")
+    st.write( "Display limited to the first 100k rows to enable sorting capability")    
     sub_df = filter_dataframe( input_pol.to_pandas(), 'Add filters?' ) # filter entire df
     st.dataframe( sub_df.iloc[:100000,:] ) # display subset
 
