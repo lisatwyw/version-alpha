@@ -157,7 +157,7 @@ lha_codes.set_index( 'LHA_NAME', inplace=True)
 # ================== setup the layout ==================
 tab1, tab2, tab3, tab4, tab5 = st.tabs([  'Time-series', 'Table', 'LHA map', 'HSDA map', 'Counts by disease' ]) 
 
-with tab1:
+with tab2:
     # plot subset as time series
     st.header("Time-series")
 
@@ -180,11 +180,11 @@ with tab1:
                      )     
      
 
-with tab2:    
+with tab1:    
     #col1, col2 = st.columns((2))    
-    st.header("Table")    
+    st.header("Table (limited to the first 100k rows to enable sorting capability)")    
     sub_df = filter_dataframe( input_pol.to_pandas(), 'Add filters?' ) # filter entire df
-    st.dataframe( sub_df ) # display subset
+    st.dataframe( sub_df.iloc[:100000,:] ) # display subset
 
 
 with tab3:       
