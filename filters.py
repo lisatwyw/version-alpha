@@ -185,8 +185,9 @@ with tab1:
     #col1, col2 = st.columns((2))    
     st.header("Stats table (mock)")
     st.write( "(Click on a column to have data sorted by that column)")    
+     st.checkbox("Expand width of columns", value=False, key="use_container_width")
     sub_df = filter_dataframe( input_pol.to_pandas(), 'Add filters?' ) # filter entire df
-    st.dataframe( sub_df ) # display subset?  .iloc[:100000,:]
+    st.dataframe( sub_df, use_container_width=st.session_state.use_container_width ) # display subset?  .iloc[:100000,:]
 
 with tab3:       
     st.header("LHA")
