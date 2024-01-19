@@ -184,7 +184,7 @@ with tab2:
 with tab1:    
     #col1, col2 = st.columns((2))    
     st.header("Stats table (mock)")
-    st.write( "Display limited to the first 100k rows to enable sorting capability")    
+    st.write( "(Click on a column to have data sorted by that column)")    
     sub_df = filter_dataframe( input_pol.to_pandas(), 'Add filters?' ) # filter entire df
     st.dataframe( sub_df ) # display subset?  .iloc[:100000,:]
 
