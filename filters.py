@@ -186,8 +186,7 @@ with tab1:
     st.header("Stats table (mock)")
     st.write( "Display limited to the first 100k rows to enable sorting capability")    
     sub_df = filter_dataframe( input_pol.to_pandas(), 'Add filters?' ) # filter entire df
-    st.dataframe( sub_df.iloc[:100000,:] ) # display subset
-
+    st.dataframe( sub_df ) # display subset?  .iloc[:100000,:]
 
 with tab3:       
     st.header("LHA")
